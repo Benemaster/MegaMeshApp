@@ -790,15 +790,19 @@ fun ConversationScreen(
                                 selectedConversation == "broadcast" -> {
                                     if (useEncryption) {
                                         viewModel.sendPublicEncrypted(messageText)
+                                        viewModel.postFeedback("📢 Verschlüsselte Broadcast-Nachricht gesendet")
                                     } else {
                                         viewModel.sendBroadcastMessage(messageText)
+                                        viewModel.postFeedback("📢 Broadcast gesendet")
                                     }
                                 }
                                 useEncryption -> {
                                     viewModel.sendEncryptedMessage(selectedConversation, messageText)
+                                    viewModel.postFeedback("🔒 Verschlüsselte Nachricht gesendet")
                                 }
                                 else -> {
                                     viewModel.sendDirectMessage(selectedConversation, messageText)
+                                    viewModel.postFeedback("✉️ Nachricht gesendet")
                                 }
                             }
                             messageText = ""

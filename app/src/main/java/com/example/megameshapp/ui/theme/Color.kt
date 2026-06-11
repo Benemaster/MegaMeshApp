@@ -2,17 +2,23 @@ package com.example.megameshapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Blue accents
-val BluePrimary = Color(0xFF1E88FF)
-val BluePrimaryDark = Color(0xFF1565C0)
-val BluePrimaryLight = Color(0xFF64B5F6)
-val BlueAccent = Color(0xFF448AFF)
+// Dark green accents
+val GreenPrimary = Color(0xFF2E7D32)
+val GreenPrimaryDark = Color(0xFF1B5E20)
+val GreenPrimaryLight = Color(0xFF66BB6A)
+val GreenAccent = Color(0xFF388E3C)
+
+// Keep legacy aliases so screens compile without changes
+val BluePrimary = GreenPrimary
+val BluePrimaryDark = GreenPrimaryDark
+val BluePrimaryLight = GreenPrimaryLight
+val BlueAccent = GreenAccent
 
 // Dark backgrounds
-val DarkBackground = Color(0xFF0B0E13)
-val DarkSurface = Color(0xFF121318)
-val DarkSurfaceVariant = Color(0xFF1E2128)
-val DarkCard = Color(0xFF1A1D24)
+val DarkBackground = Color(0xFF0A0D0A)
+val DarkSurface = Color(0xFF101410)
+val DarkSurfaceVariant = Color(0xFF1A211A)
+val DarkCard = Color(0xFF161C16)
 
 // Text colors
 val TextPrimary = Color(0xFFE8EAED)

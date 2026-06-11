@@ -58,7 +58,10 @@ fun DeviceSettingsScreen(viewModel: MeshViewModel) {
         val allGranted = permissions.values.all { it }
         if (allGranted) {
             viewModel.bleManager.startScan()
+            viewModel.postFeedback("🔍 Suche nach MegaMesh-Geräten…")
             showBleScanner = true
+        } else {
+            viewModel.postFeedback("⚠️ Bluetooth-Berechtigung fehlt")
         }
     }
 

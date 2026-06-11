@@ -42,6 +42,10 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
     private val _logLines = MutableStateFlow<List<String>>(emptyList())
     val logLines: StateFlow<List<String>> = _logLines.asStateFlow()
 
+    /** One-shot user feedback messages (Snackbar / Toast text) */
+    private val _userFeedback = MutableSharedFlow<String>(extraBufferCapacity = 8)
+    val userFeedback: SharedFlow<String> = _userFeedback.asSharedFlow()
+
     private val _localNodeId = MutableStateFlow<String?>(null)
     val localNodeId: StateFlow<String?> = _localNodeId.asStateFlow()
 
@@ -107,10 +111,14 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             bleManager.connectionState.collect { state ->
                 if (state is MeshBleManager.ConnectionState.Connected) {
+                    val name = bleManager.connectedDeviceName.value ?: "Gerät"
+                    postFeedback("✅ Verbunden mit $name")
                     kotlinx.coroutines.delay(500)
                     bleManager.sendCommand("/settings")
                     kotlinx.coroutines.delay(300)
                     bleManager.sendCommand("/id")
+                } else if (state is MeshBleManager.ConnectionState.Disconnected) {
+                    postFeedback("🔌 Verbindung getrennt")
                 }
             }
         }
@@ -150,6 +158,10 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
         current.add(line)
         if (current.size > 500) current.removeAt(0)
         _logLines.value = current
+    }
+
+    fun postFeedback(message: String) {
+        viewModelScope.launch { _userFeedback.emit(message) }
     }
 
     private fun parseLine(line: String) {
@@ -260,6 +272,7 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
                 chatPersistence.saveMessage(msg)
                 addKnownNode(origin)
                 if (!msg.isOutgoing) {
+                    postFeedback("📨 Nachricht von $origin${if (encrypted) " 🔒" else ""}")
                     notifyNewMessage(msg)
                 }
             }
@@ -358,6 +371,7 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
                 current[existingIndex] = wx
             } else {
                 current.add(wx)
+                postFeedback("🌡 Wetterdaten von $node empfangen")
             }
             _weatherData.value = current
         } catch (e: Exception) {
@@ -390,6 +404,7 @@ class MeshViewModel(application: Application) : AndroidViewModel(application) {
                     current[existingIndex] = station
                 } else {
                     current.add(station)
+                    postFeedback("📡 Neuer Knoten entdeckt: $nodeId")
                 }
                 _stations.value = current
                 addKnownNode(nodeId)
