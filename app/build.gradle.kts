@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     // ML Kit barcode scanning
     implementation(libs.mlkit.barcode)
+    implementation(libs.osmdroid.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
