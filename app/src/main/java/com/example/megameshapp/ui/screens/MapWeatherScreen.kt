@@ -384,6 +384,9 @@ fun MeshMapTab(
     }
 }
 
+// Semi-transparent dark green used for mesh connection lines on the map
+private val NODE_LINE_COLOR = Color.argb(77, 0x2E, 0x7D, 0x32) // GreenPrimary at ~30% opacity
+
 @Composable
 fun OsmMapView(nodesWithGps: List<WeatherData>) {
     AndroidView(
@@ -395,16 +398,19 @@ fun OsmMapView(nodesWithGps: List<WeatherData>) {
                 setMultiTouchControls(true)
                 controller.setZoom(12.0)
 
-                // Centre on first node
-                val first = nodesWithGps.first()
-                controller.setCenter(GeoPoint(first.latitude!!, first.longitude!!))
+                // Center on first node if available
+                nodesWithGps.firstOrNull()?.let { first ->
+                    controller.setCenter(GeoPoint(first.latitude!!, first.longitude!!))
+                }
             }
         },
         update = { mapView ->
             mapView.overlays.clear()
 
-            val geoPoints = nodesWithGps.map { wx ->
-                Pair(wx, GeoPoint(wx.latitude!!, wx.longitude!!))
+            val geoPoints = nodesWithGps.mapNotNull { wx ->
+                val lat = wx.latitude ?: return@mapNotNull null
+                val lon = wx.longitude ?: return@mapNotNull null
+                Pair(wx, GeoPoint(lat, lon))
             }
 
             // Draw connection lines between all nodes
@@ -413,7 +419,7 @@ fun OsmMapView(nodesWithGps: List<WeatherData>) {
                     for (j in i + 1 until geoPoints.size) {
                         val line = Polyline(mapView).apply {
                             setPoints(listOf(geoPoints[i].second, geoPoints[j].second))
-                            outlinePaint.color = Color.parseColor("#4D2E7D32") // semi-transparent dark green
+                            outlinePaint.color = NODE_LINE_COLOR
                             outlinePaint.strokeWidth = 3f
                             outlinePaint.isAntiAlias = true
                         }
